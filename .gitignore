@@ -1,0 +1,59 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+venv.bak/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Environment variables
+.env
+.env.local
+
+# IDE / Editor
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+#agent
+.agent/
+.agents/
+.claude/
+#skill 
+skill-lock.json
+CLAUDE.md
+sub_prompt.txt
+#sdk
+.sdk/
+doc/sdk/
+
+# Backup/old project dirs
+Face_ID/
+gym_management/
+_backup_Face_ID/
+_old_gym_management/
+
+# Face ID data (large files)
+data/dataset/
+data/encodings/
+data/embeddings/
+data/member_pics/
+data/gym_db.db
+logs/

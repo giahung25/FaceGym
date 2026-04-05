@@ -1,0 +1,67 @@
+gym_management/
+│
+├── app/                     # Thư mục chứa mã nguồn chính của ứng dụng
+│   ├── __init__.py
+│   ├── main.py              # Điểm bắt đầu chạy ứng dụng (Entry point)
+│   │
+│   ├── core/                # Các thiết lập và cấu hình cốt lõi
+│   │   ├── __init__.py
+│   │   ├── config.py        # Đọc biến môi trường (settings)
+│   │   ├── database.py      # Thiết lập kết nối cơ sở dữ liệu (sqlite)
+│   │   └── security.py      # Xử lý bảo mật, mã hóa mật khẩu, JWT token
+│   │
+│   ├── models/              # Định nghĩa cấu trúc dữ liệu (Database Schema)
+│   │   ├── __init__.py
+│   │   ├── member.py        # Dữ liệu khách hàng/hội viên
+│   │   ├── membership.py    # Các gói tập (1 tháng, 6 tháng, 1 năm...)
+│   │   ├── equipment.py     # Quản lý máy móc, thiết bị
+│   │
+│   ├── services/            # Nơi xử lý logic nghiệp vụ (Business logic)
+│   │   ├── __init__.py
+│   │   ├── member_svc.py    # Logic thêm/sửa/xóa và gia hạn thẻ hội viên  
+│   │
+│   ├── api/                 # Các API Endpoints hoặc Routes (Controller)
+│   │   ├── __init__.py
+│   │   ├── members.py       # Route quản lý hội viên (ví dụ: POST /members)
+│   │   └── auth.py          # Route đăng nhập/đăng xuất
+│   │
+│   └── utils/               # Các hàm tiện ích dùng chung
+│       ├── __init__.py
+│       ├── helpers.py       # Các hàm format ngày tháng, chuỗi...
+│
+├── tests/                   # Thư mục chứa các kịch bản kiểm thử (Testing)
+│   
+├── gui/                     # Thư mục chứa các giao diện người dùng (GUI)
+│   ├── __init__.py
+│   ├── login.py             # Giao diện đăng nhập
+│   ├── dashboard.py         # Giao diện chính
+│   ├── members.py           # Giao diện quản lý hội viên
+│   ├── memberships.py       # Giao diện quản lý gói tập
+│   ├── equipment.py         # Giao diện quản lý thiết bị
+│  
+│
+├── data/                    # Chứa database cục bộ (SQLite)
+│   └── gym_db.db
+│
+├── .venv                     # Chứa các biến môi trường nhạy cảm (DB URL, Secret keys) - KHÔNG push lên Github
+├── .gitignore               # Danh sách các file/thư mục Git cần bỏ qua
+├── requirements.txt         # Danh sách các thư viện Python cần cài đặt (pip install -r requirements.txt)
+└── README.md                # Tài liệu hướng dẫn cài đặt và sử dụng dự án
+
+dứ án này là quản lý gym
+cách thư viện sữ dụng 
+flet cho gui 
+sqlite3 cho database 
+
+Cơ sở dữ liệu (SQL): Thiết kế các bảng và quan hệ (Relationships) cho 3 module chính:
+Hội viên (Members): id, tên, số điện thoại, ngày tham gia, ảnh, trạng thái thẻ.
+
+Gói tập (MembershipPlans): id, tên gói, giá, thời hạn (tháng), mô tả. Một hội viên có thể đăng ký nhiều gói tập theo thời gian (quan hệ 1-n hoặc n-n qua bảng trung gian 'Subscriptions').
+
+Thiết bị (Equipment): id, tên máy, loại (cardio/strength), ngày mua, trạng thái bảo trì, vị trí.
+Validation: Đảm bảo có kiểm tra dữ liệu đầu vào (ví dụ: số điện thoại phải đúng định dạng, ngày hết hạn không được trước ngày đăng ký).
+Hãy viết code cho các file Model và file cấu trúc Database trước
+
+
+
+
