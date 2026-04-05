@@ -1,23 +1,21 @@
 # ============================================================================
 # FILE: gui/user/user_checkin.py
-# MỤC ĐÍCH: Màn hình CHECK-IN bằng khuôn mặt (User App).
-#            Hiển thị camera, tự động nhận diện, hiển thị kết quả.
+# MUC DICH: Man hinh CHECK-IN bang khuon mat (User App).
+#            Nhan nut -> mo camera CTk (process rieng) -> nhan ket qua qua bridge.
 # ============================================================================
 
 import flet as ft
-import cv2
-import base64
-import threading
-import time
+import asyncio
 from datetime import datetime
 
 from gui import theme
 from gui.user.components.user_sidebar import UserSidebar
-from app.services import attendance_svc, face_svc
+from app.services import attendance_svc
+from bridge import get_bridge
 
 
 def CheckinScreen(page: ft.Page) -> ft.Container:
-    """Màn hình check-in khuôn mặt cho hội viên."""
+    """Man hinh check-in khuon mat cho hoi vien."""
 
     navigate = getattr(page, "navigate", None)
     current_user = getattr(page, "current_user", None)
@@ -27,46 +25,15 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
             navigate("login")
         return ft.Container()
 
-    # ── State ────────────────────────────────────────────────────────────────
-    camera_state = {"running": False, "cap": None}
-    last_result = {"name": "", "time": 0}
+    bridge = get_bridge()
+    DISPLAY_SIZE = (480, 360)
 
-    # ── Camera ───────────────────────────────────────────────────────────────
-    # src="" thay cho src_base64=""; fit=ft.BoxFit (API mới)
-    camera_image = ft.Image(
-        src="",
-        width=480,
-        height=360,
-        fit=ft.BoxFit.CONTAIN,
-        border_radius=12,
-    )
-
-    camera_placeholder = ft.Container(
-        content=ft.Column(
-            controls=[
-                ft.Icon(ft.Icons.FACE, size=64, color=theme.GRAY),
-                ft.Text("Bấm nút bên dưới để bắt đầu check-in",
-                        size=theme.FONT_MD, color=theme.GRAY,
-                        text_align=ft.TextAlign.CENTER),
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=theme.PAD_MD,
-        ),
-        width=480,
-        height=360,
-        bgcolor="#1A1A2E",
-        border_radius=12,
-        alignment=ft.Alignment.CENTER,
-    )
-
-    camera_container = ft.Container(content=camera_placeholder, width=480, height=360)
-
-    # ── Kết quả ──────────────────────────────────────────────────────────────
+    # ── Ket qua nhan dien ─────────────────────────────────────────────────────
     result_icon = ft.Icon(ft.Icons.FACE, size=48, color=theme.GRAY)
-    result_title = ft.Text("Sẵn sàng check-in", size=theme.FONT_2XL,
+    result_title = ft.Text("San sang check-in", size=theme.FONT_2XL,
                            weight=ft.FontWeight.BOLD, color=theme.TEXT_PRIMARY,
                            text_align=ft.TextAlign.CENTER)
-    result_message = ft.Text("Nhìn thẳng vào camera để nhận diện",
+    result_message = ft.Text("Nhan nut ben duoi de bat dau",
                              size=theme.FONT_MD, color=theme.TEXT_SECONDARY,
                              text_align=ft.TextAlign.CENTER)
     result_time = ft.Text("", size=theme.FONT_SM, color=theme.GRAY,
@@ -82,11 +49,30 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
         border_radius=theme.CARD_RADIUS,
         padding=ft.padding.all(theme.PAD_2XL),
         border=ft.border.all(1, theme.BORDER),
-        width=480,
+        width=DISPLAY_SIZE[0],
         alignment=ft.Alignment.CENTER,
     )
 
-    # ── Lịch sử điểm danh gần đây ──────────────────────────────────────────
+    # ── Camera status placeholder ─────────────────────────────────────────────
+    camera_status_icon = ft.Icon(ft.Icons.FACE, size=64, color=theme.GRAY)
+    camera_status_text = ft.Text("Bam nut ben duoi de bat dau check-in",
+                                  size=theme.FONT_MD, color=theme.GRAY,
+                                  text_align=ft.TextAlign.CENTER)
+
+    camera_placeholder = ft.Container(
+        content=ft.Column(
+            controls=[camera_status_icon, camera_status_text],
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=theme.PAD_MD,
+        ),
+        width=DISPLAY_SIZE[0],
+        height=DISPLAY_SIZE[1],
+        bgcolor="#1A1A2E",
+        border_radius=12,
+        alignment=ft.Alignment.CENTER,
+    )
+
+    # ── Lich su diem danh gan day ─────────────────────────────────────────────
     history_list = ft.Column(controls=[], spacing=0)
 
     def load_history():
@@ -131,7 +117,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
             if not records:
                 history_list.controls.append(
                     ft.Container(
-                        content=ft.Text("Chưa có lịch sử điểm danh",
+                        content=ft.Text("Chua co lich su diem danh",
                                         size=theme.FONT_SM, color=theme.GRAY),
                         padding=ft.padding.all(theme.PAD_LG),
                     )
@@ -139,132 +125,125 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
         except Exception:
             pass
 
-    # ── Camera loop ──────────────────────────────────────────────────────────
-    def camera_loop():
-        cap = cv2.VideoCapture(0)
-        camera_state["cap"] = cap
+    # ── Xu ly ket qua tu camera process ──────────────────────────────────────
+    last_checkin = {"name": "", "time": 0}
+    listener_running = {"active": False}
 
-        if not cap.isOpened():
-            result_title.value = "Không thể mở camera!"
-            result_icon.color = theme.RED
-            result_icon.icon = ft.Icons.ERROR
-            page.update()
-            return
+    async def listen_camera_results():
+        """Async loop lang nghe result_queue tu camera process."""
+        listener_running["active"] = True
+        while bridge.is_camera_running():
+            msg = bridge.get_result()
+            if msg:
+                msg_type = msg.get("type", "")
 
-        frame_count = {"value": 0}
+                if msg_type == "recognition":
+                    member_id = msg.get("member_id", "")
+                    confidence = msg.get("confidence", 0)
 
-        while camera_state["running"]:
-            ret, frame = cap.read()
-            if not ret:
-                time.sleep(0.03)
-                continue
+                    # Cooldown 10s cho cung 1 nguoi
+                    import time
+                    now = time.time()
+                    if (last_checkin["name"] != member_id or
+                            now - last_checkin["time"] > 10):
+                        last_checkin["name"] = member_id
+                        last_checkin["time"] = now
 
-            display_frame = frame.copy()
-            frame_count["value"] += 1
+                        checkin_result = attendance_svc.check_in_by_face(
+                            member_id, confidence
+                        )
+                        status = checkin_result.get("status", "error")
+                        member_name = checkin_result.get("member_name", member_id)
+                        now_str = datetime.now().strftime("%H:%M:%S")
 
-            if frame_count["value"] % 5 == 0:
-                try:
-                    results = face_svc.recognize_frame(frame)
-                    if results:
-                        for res in results:
-                            name = res.get("name", "Unknown")
-                            confidence = res.get("confidence", 0)
-                            bbox = res.get("bbox", None)
+                        if status == "success":
+                            result_icon.icon = ft.Icons.CHECK_CIRCLE
+                            result_icon.color = theme.GREEN
+                            result_title.value = f"Xin chao, {member_name}!"
+                            result_message.value = "Check-in thanh cong!"
+                            result_message.color = theme.GREEN
+                            result_time.value = f"Thoi gian: {now_str}"
+                            load_history()
+                        elif status == "already":
+                            result_icon.icon = ft.Icons.INFO
+                            result_icon.color = theme.BLUE
+                            result_title.value = f"Chao, {member_name}!"
+                            result_message.value = "Ban da diem danh hom nay roi"
+                            result_message.color = theme.BLUE
+                            result_time.value = ""
+                        elif status == "expired":
+                            result_icon.icon = ft.Icons.WARNING
+                            result_icon.color = theme.AMBER
+                            result_title.value = f"Chao, {member_name}!"
+                            result_message.value = "Da check-in! (Goi tap het han)"
+                            result_message.color = theme.AMBER
+                            result_time.value = "Vui long gia han tai quay"
+                            load_history()
+                        elif status != "cooldown":
+                            result_icon.icon = ft.Icons.ERROR
+                            result_icon.color = theme.AMBER
+                            result_title.value = "Loi"
+                            result_message.value = checkin_result.get("message", "")
+                            result_message.color = theme.AMBER
 
-                            if bbox:
-                                top, right, bottom, left = bbox
-                                cv2.rectangle(display_frame, (left, top), (right, bottom),
-                                              (0, 255, 0), 2)
+                        page.update()
 
-                            if name != "Unknown" and confidence > 0:
-                                now = time.time()
-                                if (last_result["name"] != name or
-                                        now - last_result["time"] > 10):
-                                    checkin_result = attendance_svc.check_in_by_face(
-                                        name, confidence
-                                    )
-                                    status = checkin_result.get("status", "error")
-                                    member_name = checkin_result.get("member_name", name)
+                elif msg_type == "camera_closed":
+                    camera_status_icon.icon = ft.Icons.FACE
+                    camera_status_icon.color = theme.GRAY
+                    camera_status_text.value = "Camera da dong. Bam nut de mo lai."
+                    btn_text.value = "Bat dau Check-in"
+                    btn_icon.icon = ft.Icons.FACE
+                    page.update()
+                    break
 
-                                    last_result["name"] = name
-                                    last_result["time"] = now
+                elif msg_type == "camera_error":
+                    camera_status_text.value = f"Loi: {msg.get('message', '')}"
+                    page.update()
 
-                                    now_str = datetime.now().strftime("%H:%M:%S")
+            await asyncio.sleep(0.1)
 
-                                    if status == "success":
-                                        result_icon.icon = ft.Icons.CHECK_CIRCLE
-                                        result_icon.color = theme.GREEN
-                                        result_title.value = f"Xin chào, {member_name}!"
-                                        result_message.value = "Check-in thành công!"
-                                        result_message.color = theme.GREEN
-                                        result_time.value = f"Thời gian: {now_str}"
-                                        load_history()
-                                    elif status == "already":
-                                        result_icon.icon = ft.Icons.INFO
-                                        result_icon.color = theme.BLUE
-                                        result_title.value = f"Chào, {member_name}!"
-                                        result_message.value = "Bạn đã điểm danh hôm nay rồi"
-                                        result_message.color = theme.BLUE
-                                        result_time.value = ""
-                                    elif status == "expired":
-                                        result_icon.icon = ft.Icons.WARNING
-                                        result_icon.color = theme.RED
-                                        result_title.value = member_name
-                                        result_message.value = "Gói tập đã hết hạn!"
-                                        result_message.color = theme.RED
-                                        result_time.value = "Vui lòng gia hạn tại quầy"
-                                    elif status != "cooldown":
-                                        result_icon.icon = ft.Icons.ERROR
-                                        result_icon.color = theme.AMBER
-                                        result_title.value = "Lỗi"
-                                        result_message.value = checkin_result.get("message", "")
-                                        result_message.color = theme.AMBER
-                except Exception as ex:
-                    print(f"[ERROR] Face recognition: {ex}")
-
-            # API mới: camera_image.src thay vì .src_base64
-            _, buffer = cv2.imencode('.jpg', display_frame,
-                                     [cv2.IMWRITE_JPEG_QUALITY, 70])
-            img_base64 = base64.b64encode(buffer).decode()
-            camera_image.src = img_base64
-
-            try:
-                page.update()
-            except Exception:
-                break
-
-            time.sleep(0.03)
-
-        cap.release()
-        camera_state["cap"] = None
+        listener_running["active"] = False
 
     # ── Toggle camera ────────────────────────────────────────────────────────
-    btn_text = ft.Text("Bắt đầu Check-in", size=theme.FONT_MD, weight=ft.FontWeight.BOLD,
-                       color=theme.WHITE)
+    btn_text = ft.Text("Bat dau Check-in", size=theme.FONT_MD,
+                       weight=ft.FontWeight.BOLD, color=theme.WHITE)
     btn_icon = ft.Icon(ft.Icons.FACE, size=20, color=theme.WHITE)
 
     def toggle_camera(e):
-        if not camera_state["running"]:
-            camera_state["running"] = True
-            camera_container.content = camera_image
-            btn_text.value = "Dừng Camera"
+        if not bridge.is_camera_running():
+            # Mo camera process
+            result = bridge.open_camera(mode="recognize")
+            if "error" in result:
+                camera_status_text.value = result["error"]
+                page.update()
+                return
+
+            camera_status_icon.icon = ft.Icons.VIDEOCAM
+            camera_status_icon.color = theme.ORANGE
+            camera_status_text.value = "Camera dang chay (cua so rieng)"
+            btn_text.value = "Dung Camera"
             btn_icon.icon = ft.Icons.STOP
-            result_title.value = "Đang quét..."
-            result_message.value = "Nhìn thẳng vào camera"
+            result_title.value = "Dang quet..."
+            result_message.value = "Nhin thang vao camera"
             result_message.color = theme.TEXT_SECONDARY
             result_icon.icon = ft.Icons.FACE
             result_icon.color = theme.ORANGE
             page.update()
-            t = threading.Thread(target=camera_loop, daemon=True)
-            t.start()
+
+            # Bat dau lang nghe ket qua
+            if not listener_running["active"]:
+                page.run_task(listen_camera_results)
         else:
-            camera_state["running"] = False
-            camera_container.content = camera_placeholder
-            btn_text.value = "Bắt đầu Check-in"
+            # Dong camera
+            bridge.close_camera()
+            camera_status_icon.icon = ft.Icons.FACE
+            camera_status_icon.color = theme.GRAY
+            camera_status_text.value = "Bam nut ben duoi de bat dau check-in"
+            btn_text.value = "Bat dau Check-in"
             btn_icon.icon = ft.Icons.FACE
-            camera_image.src = ""   # API mới
-            result_title.value = "Sẵn sàng check-in"
-            result_message.value = "Nhìn thẳng vào camera để nhận diện"
+            result_title.value = "San sang check-in"
+            result_message.value = "Nhan nut ben duoi de bat dau"
             result_message.color = theme.TEXT_SECONDARY
             result_icon.icon = ft.Icons.FACE
             result_icon.color = theme.GRAY
@@ -282,18 +261,18 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
         padding=ft.padding.symmetric(horizontal=theme.PAD_2XL, vertical=14),
         on_click=toggle_camera,
         ink=True,
-        width=480,
+        width=DISPLAY_SIZE[0],
         alignment=ft.Alignment.CENTER,
     )
 
-    # ── Layout ───────────────────────────────────────────────────────────────
+    # ── Layout ────────────────────────────────────────────────────────────────
     main_content = ft.Column(
         controls=[
             ft.Container(
                 content=ft.Row(
                     controls=[
                         ft.Icon(ft.Icons.FACE, size=24, color=theme.ORANGE),
-                        ft.Text("Check-in bằng khuôn mặt", size=theme.FONT_2XL,
+                        ft.Text("Check-in bang khuon mat", size=theme.FONT_2XL,
                                 weight=ft.FontWeight.BOLD, color=theme.TEXT_PRIMARY),
                     ],
                     spacing=theme.PAD_MD,
@@ -303,7 +282,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
             ft.Row(
                 controls=[
                     ft.Column(
-                        controls=[camera_container, btn_toggle],
+                        controls=[camera_placeholder, btn_toggle],
                         spacing=theme.PAD_MD,
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     ),
@@ -313,7 +292,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
                             ft.Container(
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text("Lịch sử điểm danh gần đây",
+                                        ft.Text("Lich su diem danh gan day",
                                                 size=theme.FONT_MD,
                                                 weight=ft.FontWeight.W_600,
                                                 color=theme.TEXT_PRIMARY),
@@ -325,7 +304,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
                                 border_radius=theme.CARD_RADIUS,
                                 padding=ft.padding.all(theme.PAD_LG),
                                 border=ft.border.all(1, theme.BORDER),
-                                width=480,
+                                width=DISPLAY_SIZE[0],
                             ),
                         ],
                         spacing=theme.PAD_MD,

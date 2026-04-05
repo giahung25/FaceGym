@@ -57,3 +57,8 @@ EMBEDDINGS_PATH = os.path.join(DATA_DIR, "embeddings")       # File embeddings d
 LOG_DIR = os.path.join(BASE_DIR, "logs")
 LOG_FILE = os.path.join(LOG_DIR, "system.log")
 LOG_LEVEL = "INFO"
+
+# ── Tự động tạo các thư mục cần thiết nếu chưa tồn tại ─────────────────────
+# exist_ok=True: nếu thư mục đã có rồi thì bỏ qua, không báo lỗi
+for _dir in [DATA_DIR, DATASET_PATH, MEMBER_PICS_PATH, ENCODINGS_PATH, EMBEDDINGS_PATH, LOG_DIR]:
+    os.makedirs(_dir, exist_ok=True)

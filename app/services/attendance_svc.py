@@ -45,10 +45,9 @@ def check_in(member_id, method="face_id", confidence=None):
 
     # 3. Kiểm tra gói tập còn hạn không
     active_subs = membership_repo.get_active_subscriptions_by_member(member_id)
-    if not active_subs:
-        return {"status": "expired", "message": "Hết hạn gói tập!"}
+    is_expired = not active_subs
 
-    # 4. Ghi nhận check-in
+    # 4. Ghi nhận check-in (vẫn ghi ngay cả khi hết hạn gói tập)
     attendance = Attendance(
         member_id=member_id,
         check_in_time=datetime.now().isoformat(),
@@ -59,6 +58,9 @@ def check_in(member_id, method="face_id", confidence=None):
 
     _recently_checked[member_id] = now
     logger.info(f"CHECK-IN: member={member_id}, method={method}, confidence={confidence}")
+
+    if is_expired:
+        return {"status": "expired", "message": "Check-in thành công, nhưng gói tập đã hết hạn!"}
 
     return {"status": "success", "message": "Check-in thành công!"}
 

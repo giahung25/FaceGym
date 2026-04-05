@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import flet as ft  # Flet = framework GUI cho Python (tạo giao diện desktop/web)
 from app.core.config import APP_TITLE, WINDOW_WIDTH, WINDOW_HEIGHT  # Hằng số cấu hình
 from app.core.database import init_db  # Hàm tạo bảng database
+from bridge import get_bridge  # CameraBridge — giao tiếp với camera process
 
 
 def main(page: ft.Page):
@@ -118,7 +119,15 @@ def main(page: ft.Page):
     # → Cho phép BẤT KỲ screen nào cũng có thể gọi: page.navigate("dashboard")
     page.navigate = navigate
 
-    # ── Bước 5: Hiển thị màn hình đầu tiên ───────────────────────────────────
+    # ── Bước 5: Cleanup camera khi đóng app ────────────────────────────────────
+    def on_close(e):
+        """Đóng camera process an toàn khi tắt Flet."""
+        bridge = get_bridge()
+        bridge.close_camera()
+
+    page.on_close = on_close
+
+    # ── Bước 6: Hiển thị màn hình đầu tiên ───────────────────────────────────
     navigate("login")  # Khởi động tại màn hình đăng nhập
 
 
@@ -127,4 +136,7 @@ def main(page: ft.Page):
 # ══════════════════════════════════════════════════════════════════════════════
 # ft.run(main) = Flet khởi tạo cửa sổ desktop, rồi gọi main(page)
 # Đây là dòng code ĐẦU TIÊN được thực thi khi chạy: python app/main.py
-ft.run(main)
+if __name__ == "__main__":
+    import multiprocessing
+    multiprocessing.freeze_support()  # Cần cho Windows khi đóng gói exe
+    ft.run(main)
