@@ -51,9 +51,10 @@ _backup_Face_ID/
 _old_gym_management/
 
 # Face ID data (large files)
-data/dataset/
-data/encodings/
-data/embeddings/
-data/member_pics/
+data/dataset/*
+data/encodings/*
+data/embeddings/*
+data/member_pics/*
 data/gym_db.db
+!data/**/.gitkeep
 logs/
