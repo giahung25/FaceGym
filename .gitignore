@@ -45,9 +45,6 @@ sub_prompt.txt
 doc/sdk/
 
 # Backup/old project dirs
-Face_ID/
-gym_management/
-_backup_Face_ID/
 _old_gym_management/
 
 # Face ID data (large files)
