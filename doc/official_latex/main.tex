@@ -1,0 +1,793 @@
+\documentclass[12pt,a4paper]{article}
+
+% ======================== PACKAGES ========================
+\usepackage[T5]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage[left=3cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{caption}
+
+% ======================== SETTINGS ========================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    urlcolor=blue!70!black,
+    citecolor=blue!60!black
+}
+
+% Code listing style
+\definecolor{codebg}{RGB}{245,245,245}
+\definecolor{codegreen}{RGB}{0,128,0}
+\definecolor{codegray}{RGB}{128,128,128}
+\definecolor{codeblue}{RGB}{0,0,180}
+\definecolor{codepurple}{RGB}{128,0,128}
+
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{codebg},
+    commentstyle=\color{codegreen}\itshape,
+    keywordstyle=\color{codeblue}\bfseries,
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{codegray!50},
+    numbers=left,
+    numberstyle=\tiny\color{codegray},
+    numbersep=8pt,
+    tabsize=4,
+    showstringspaces=false,
+    captionpos=b,
+    language=Python
+}
+
+\lstdefinestyle{sqlstyle}{
+    backgroundcolor=\color{codebg},
+    keywordstyle=\color{codeblue}\bfseries,
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{codegray!50},
+    numbers=left,
+    numberstyle=\tiny\color{codegray},
+    numbersep=8pt,
+    tabsize=4,
+    showstringspaces=false,
+    language=SQL
+}
+
+% Header/Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Gym Management System -- Face ID}}
+\fancyhead[R]{\small\textit{Lập trình Python và Ứng dụng}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Section formatting
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection.}{0.5em}{}
+
+% ======================== DOCUMENT ========================
+\begin{document}
+
+% ======================== BIA NGOAI (Trang 1) ========================
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+	% Border frame
+	\draw[line width=2pt, blue!60!black]
+	([shift={(1.2cm,-1cm)}]current page.north west) rectangle
+		([shift={(-0.8cm,1cm)}]current page.south east);
+	\draw[line width=0.5pt, blue!60!black]
+	([shift={(1.4cm,-1.2cm)}]current page.north west) rectangle
+		([shift={(-1cm,1.2cm)}]current page.south east);
+\end{tikzpicture}
+
+\begin{center}
+	\textbf{\large TRƯỜNG ĐẠI HỌC ĐỒNG THÁP} \\[4pt]
+	\textbf{\large KHOA CÔNG NGHỆ VÀ KỸ THUẬT} \\[20pt]
+
+	% Logo
+	\includegraphics[width=3.5cm]{logo_dthu.png} \\[25pt]
+
+	% Subject
+	{\Large \textbf{LẬP TRÌNH PYTHON VÀ ỨNG DỤNG}} \\[30pt]
+
+	% Title
+	\rule{0.6\textwidth}{0.5pt} \\[10pt]
+	{\large \textbf{HỆ THỐNG QUẢN LÝ PHÒNG GYM}} \\[10pt]
+	\rule{0.6\textwidth}{0.5pt} \\[40pt]
+
+	% Student info
+	{\large Phan Trần Gia Hưng -- 0024417689} \\[6pt]
+	{\large LỚP: ĐHCNTT24B-IT} \\[50pt]
+
+	% Location and date
+	{\large Đồng Tháp, tháng 4 năm 2026}
+\end{center}
+
+\newpage
+
+% ======================== BIA TRONG (Trang 2) ========================
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+	\draw[line width=2pt, blue!60!black]
+	([shift={(1.2cm,-1cm)}]current page.north west) rectangle
+		([shift={(-0.8cm,1cm)}]current page.south east);
+	\draw[line width=0.5pt, blue!60!black]
+	([shift={(1.4cm,-1.2cm)}]current page.north west) rectangle
+		([shift={(-1cm,1.2cm)}]current page.south east);
+\end{tikzpicture}
+
+\begin{center}
+	\textbf{\large TRƯỜNG ĐẠI HỌC ĐỒNG THÁP} \\[4pt]
+	\textbf{\large KHOA CÔNG NGHỆ VÀ KỸ THUẬT} \\[20pt]
+
+	% Logo
+	\includegraphics[width=3.5cm]{logo_dthu.png} \\[25pt]
+
+	{\Large \textbf{LẬP TRÌNH PYTHON VÀ ỨNG DỤNG}} \\[30pt]
+
+	\rule{0.6\textwidth}{0.5pt} \\[10pt]
+	{\LARGE \textbf{HỆ THỐNG QUẢN LÝ PHÒNG GYM}} \\[6pt]
+	{\large \textbf{(Gym Management System)}} \\[10pt]
+	\rule{0.6\textwidth}{0.5pt} \\[30pt]
+
+	% Student info (detailed)
+	{\large 0024417689 -- Phan Trần Gia Hưng} \\[6pt]
+	{\large LỚP: ĐHCNTT24B-IT} \\[30pt]
+
+	% Advisor
+	{\large \textbf{GIẢNG VIÊN HƯỚNG DẪN: ThS. Nguyễn Quốc Anh}} \\[40pt]
+
+	{\large Đồng Tháp, tháng 4 năm 2026}
+\end{center}
+
+\newpage
+
+% ======================== MUC LUC ========================
+\thispagestyle{empty}
+\tableofcontents
+\newpage
+
+% ======================== NOI DUNG ========================
+\setcounter{page}{1}
+
+% ============================================================
+\section{Lý do chọn đề tài và Mục tiêu}
+% ============================================================
+
+\subsection{Lý do chọn đề tài}
+
+Trong bối cảnh ngành fitness và gym đang phát triển mạnh mẽ tại Việt Nam, việc quản lý phòng gym theo cách truyền thống (sổ sách, Excel) gặp nhiều hạn chế:
+
+\begin{itemize}[leftmargin=2cm]
+	\item Khó theo dõi thông tin hội viên, gói tập, thiết bị khi số lượng lớn.
+	\item Điểm danh thủ công tốn thời gian, dễ sai sót và không chuyên nghiệp.
+	\item Không có công cụ thống kê, báo cáo để hỗ trợ ra quyết định kinh doanh.
+	\item Hội viên không thể tự tra cứu thông tin gói tập, lịch sử của mình.
+\end{itemize}
+
+Đề tài này nhằm xây dựng một hệ thống quản lý phòng gym toàn diện, tích hợp công nghệ \textbf{nhận diện khuôn mặt (Face ID)} để tự động hóa điểm danh, nâng cao trải nghiệm người dùng và hiệu quả vận hành.
+
+\subsection{Mục tiêu đề tài}
+
+\begin{enumerate}[leftmargin=2cm]
+	\item Xây dựng ứng dụng desktop quản lý phòng gym với đầy đủ chức năng CRUD cho hội viên, gói tập, thiết bị, huấn luyện viên.
+	\item Tích hợp nhận diện khuôn mặt để điểm danh tự động thông qua camera.
+	\item Cung cấp dashboard thống kê và báo cáo trực quan cho quản trị viên.
+	\item Xây dựng app riêng cho hội viên và huấn luyện viên tự tra cứu thông tin.
+	\item Áp dụng kiến trúc phân tầng (Layered Architecture) để dễ bảo trì và mở rộng.
+\end{enumerate}
+
+% ============================================================
+\section{Mô tả bài toán}
+% ============================================================
+
+Hệ thống gồm \textbf{2 ứng dụng riêng biệt} cùng chia sẻ một backend:
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{GymAdmin App} (\texttt{app/main.py}): Dành cho quản trị viên -- quản lý toàn bộ hệ thống.
+	\item \textbf{GymFit Member App} (\texttt{app/user\_main.py}): Dành cho hội viên và huấn luyện viên -- tự tra cứu thông tin cá nhân.
+\end{itemize}
+
+\subsection{Các chức năng chính}
+
+\begin{table}[H]
+	\centering
+	\caption{Danh sách chức năng hệ thống}
+	\begin{tabularx}{\textwidth}{|l|X|l|}
+		\hline
+		\textbf{Module}       & \textbf{Chức năng}                                            & \textbf{App} \\
+		\hline
+		Quản lý hội viên      & Thêm, sửa, xóa (mềm), tìm kiếm, lọc theo giới tính/trạng thái & Admin        \\
+		\hline
+		Quản lý gói tập       & CRUD gói tập, đăng ký, gia hạn, hủy, tự động hết hạn          & Admin        \\
+		\hline
+		Quản lý thiết bị      & CRUD, lọc theo trạng thái (hoạt động/bảo trì/hỏng)            & Admin        \\
+		\hline
+		Quản lý HLV           & CRUD huấn luyện viên, gán học viên                            & Admin        \\
+		\hline
+		Điểm danh Face ID     & Nhận diện khuôn mặt qua camera, check-in/check-out tự động    & Admin        \\
+		\hline
+		Dashboard             & KPI, biểu đồ doanh thu, cảnh báo sắp hết hạn                  & Admin        \\
+		\hline
+		Báo cáo               & Thống kê hội viên, doanh thu, thiết bị                        & Admin        \\
+		\hline
+		Xem thông tin cá nhân & Hội viên/HLV tự xem profile, gói tập, lịch sử                 & User         \\
+		\hline
+		Thông báo             & Cảnh báo gói sắp hết hạn, thông báo hệ thống                  & User         \\
+		\hline
+	\end{tabularx}
+\end{table}
+
+% ============================================================
+\section{Tổng quan về Python}
+% ============================================================
+
+\subsection{Đặc điểm}
+
+Python là ngôn ngữ lập trình bậc cao, được thiết kế với cú pháp đơn giản, dễ đọc. Các đặc điểm nổi bật:
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{Cú pháp sạch sẽ}, dễ học, phù hợp cho cả người mới và chuyên gia.
+	\item \textbf{Thư viện phong phú}: Hỗ trợ từ GUI, machine learning, xử lý ảnh đến database.
+	\item \textbf{Đa nền tảng}: Chạy trên Windows, macOS, Linux mà không cần sửa code.
+	\item \textbf{Cộng đồng lớn}: Dễ tìm kiếm tài liệu, hỗ trợ và thư viện mã nguồn mở.
+\end{itemize}
+
+\subsection{Thư viện sử dụng}
+
+\begin{table}[H]
+	\centering
+	\caption{Các thư viện chính}
+	\begin{tabularx}{\textwidth}{|l|l|X|}
+		\hline
+		\textbf{Thư viện}          & \textbf{Phiên bản} & \textbf{Vai trò}                                     \\
+		\hline
+		\texttt{flet}              & 0.82.2             & Framework GUI desktop, xây dựng giao diện người dùng \\
+		\hline
+		\texttt{sqlite3}           & Built-in           & Cơ sở dữ liệu quan hệ dạng file, không cần server    \\
+		\hline
+		\texttt{face\_recognition} & 1.3.0              & Nhận diện và mã hóa khuôn mặt dựa trên dlib          \\
+		\hline
+		\texttt{opencv-python}     & 4.x                & Xử lý ảnh, chụp ảnh từ camera (cv2)                  \\
+		\hline
+		\texttt{numpy}             & 1.x                & Tính toán ma trận, hỗ trợ face\_recognition          \\
+		\hline
+		\texttt{uuid}              & Built-in           & Tạo ID duy nhất dạng UUID4 cho mọi bản ghi           \\
+		\hline
+	\end{tabularx}
+\end{table}
+
+% ============================================================
+\section{Cơ sở dữ liệu}
+% ============================================================
+
+Hệ thống sử dụng \textbf{SQLite3} -- cơ sở dữ liệu dạng file, không cần cài đặt server riêng. File database: \texttt{data/gym\_db.db}.
+
+\subsection{Các bảng dữ liệu}
+
+Hệ thống gồm \textbf{10 bảng}:
+
+\begin{table}[H]
+	\centering
+	\caption{Danh sách các bảng trong CSDL}
+	\begin{tabularx}{\textwidth}{|c|l|X|}
+		\hline
+		\textbf{STT} & \textbf{Tên bảng}             & \textbf{Mô tả}                                           \\
+		\hline
+		1            & \texttt{members}              & Thông tin hội viên (tên, SĐT, email, PIN, Face ID)       \\
+		\hline
+		2            & \texttt{membership\_plans}    & Định nghĩa các gói tập (tên, giá, thời hạn)              \\
+		\hline
+		3            & \texttt{subscriptions}        & Đăng ký gói tập (liên kết member $\leftrightarrow$ plan) \\
+		\hline
+		4            & \texttt{equipment}            & Thiết bị phòng gym (tên, loại, trạng thái)               \\
+		\hline
+		5            & \texttt{trainers}             & Huấn luyện viên (tên, chuyên môn, PIN)                   \\
+		\hline
+		6            & \texttt{notifications}        & Thông báo cho hội viên/HLV                               \\
+		\hline
+		7            & \texttt{trainer\_assignments} & Liên kết HLV $\leftrightarrow$ học viên                  \\
+		\hline
+		8            & \texttt{training\_sessions}   & Buổi tập HLV--học viên                                   \\
+		\hline
+		9            & \texttt{attendance}           & Điểm danh (check-in/out bằng Face ID)                    \\
+		\hline
+		10           & \texttt{transactions}         & Giao dịch thanh toán                                     \\
+		\hline
+	\end{tabularx}
+\end{table}
+
+\subsection{Sơ đồ quan hệ giữa các bảng}
+
+\begin{verbatim}
+members --1:N--> subscriptions <--N:1-- membership_plans
+   |                  |
+   |     1:N          |
+   |--------> attendance
+   |--------> transactions
+   |--------> trainer_assignments <--N:1-- trainers
+   |                  |
+   |                  |--> training_sessions
+   |--------> notifications
+\end{verbatim}
+
+\textbf{Quy tắc chung:}
+\begin{itemize}[leftmargin=2cm]
+	\item Tất cả ID là \textbf{UUID4} (TEXT PRIMARY KEY), không dùng auto-increment.
+	\item Mọi bảng (trừ notifications) có \texttt{created\_at}, \texttt{updated\_at}, \texttt{is\_active}.
+	\item Foreign Keys được bật bằng \texttt{PRAGMA foreign\_keys = ON}.
+	\item Soft delete: \texttt{is\_active = 0} thay vì DELETE.
+\end{itemize}
+
+\subsection{Chi tiết bảng members}
+
+\begin{table}[H]
+	\centering
+	\caption{Cấu trúc bảng \texttt{members}}
+	\begin{tabularx}{\textwidth}{|l|l|l|X|}
+		\hline
+		\textbf{Cột}     & \textbf{Kiểu} & \textbf{Ràng buộc} & \textbf{Mô tả}            \\
+		\hline
+		id               & TEXT          & PK                 & UUID4 duy nhất            \\
+		\hline
+		name             & TEXT          & NOT NULL           & Họ tên hội viên           \\
+		\hline
+		phone            & TEXT          & NOT NULL, UNIQUE   & Số điện thoại (đăng nhập) \\
+		\hline
+		email            & TEXT          & --                 & Email                     \\
+		\hline
+		gender           & TEXT          & --                 & male/female/other         \\
+		\hline
+		date\_of\_birth  & TEXT          & --                 & Ngày sinh (YYYY-MM-DD)    \\
+		\hline
+		pin              & TEXT          & NOT NULL, CHECK(6) & Mã PIN 6 số               \\
+		\hline
+		face\_registered & INTEGER       & DEFAULT 0          & Đã đăng ký Face ID chưa   \\
+		\hline
+		is\_active       & INTEGER       & DEFAULT 1          & Soft delete flag          \\
+		\hline
+	\end{tabularx}
+\end{table}
+
+% ============================================================
+\section{Kết nối Python với CSDL}
+% ============================================================
+
+\subsection{Context Manager \texttt{get\_db()}}
+
+Hệ thống sử dụng Context Manager để quản lý kết nối database an toàn:
+
+\begin{lstlisting}[style=pythonstyle, caption={Context Manager kết nối database}]
+@contextmanager
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row     # Ket qua dang dict-like
+    conn.execute("PRAGMA foreign_keys = ON")  # Bat Foreign Key
+    try:
+        yield conn        # Tra connection cho caller
+        conn.commit()     # Khong loi -> commit
+    except Exception:
+        conn.rollback()   # Co loi -> rollback
+        raise
+    finally:
+        conn.close()      # Luon dong connection
+\end{lstlisting}
+
+\textbf{Giải thích:}
+\begin{itemize}[leftmargin=2cm]
+	\item \texttt{@contextmanager}: Biến hàm thành context manager, dùng với \texttt{with}.
+	\item \texttt{row\_factory = sqlite3.Row}: Truy cập cột bằng tên (\texttt{row["name"]}) thay vì index.
+	\item \texttt{PRAGMA foreign\_keys = ON}: SQLite mặc định tắt FK, phải bật thủ công.
+	\item Tự động \texttt{commit} khi thành công, \texttt{rollback} khi lỗi, \texttt{close} luôn luôn.
+\end{itemize}
+
+\subsection{Khởi tạo Database -- \texttt{init\_db()}}
+
+Hàm \texttt{init\_db()} được gọi một lần khi app khởi động, tạo 10 bảng và các index:
+
+\begin{lstlisting}[style=sqlstyle, caption={Tạo bảng members}]
+CREATE TABLE IF NOT EXISTS members (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL UNIQUE,
+    email TEXT,
+    gender TEXT,
+    date_of_birth TEXT,
+    address TEXT,
+    emergency_contact TEXT,
+    photo TEXT,
+    pin TEXT NOT NULL DEFAULT '000000' CHECK(LENGTH(pin) = 6),
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    is_active INTEGER NOT NULL DEFAULT 1
+);
+\end{lstlisting}
+
+\subsection{Migration}
+
+Để thêm cột mới vào database cũ mà không mất dữ liệu, hệ thống dùng pattern \texttt{try/except ALTER TABLE}:
+
+\begin{lstlisting}[style=pythonstyle, caption={Migration thêm cột}]
+# Them cot face_registered neu chua co
+try:
+    conn.execute(
+        "ALTER TABLE members ADD COLUMN face_registered "
+        "INTEGER NOT NULL DEFAULT 0"
+    )
+except Exception:
+    pass  # Cot da ton tai -- bo qua
+\end{lstlisting}
+
+% ============================================================
+\section{Cài đặt các chức năng chính}
+% ============================================================
+
+Hệ thống tuân theo kiến trúc phân tầng nghiêm ngặt: \textbf{GUI $\rightarrow$ Service $\rightarrow$ Repository $\rightarrow$ Database}.
+
+\begin{verbatim}
++----------------------------------------------------------+
+|                    GUI Layer (Flet)                        |
+|  login | dashboard | members | memberships | equipment   |
+|  trainers | reports | attendance | face_register         |
++---------------------------+------------------------------+
+                            |
++---------------------------v------------------------------+
+|                   Services Layer                         |
+|  member_svc | membership_svc | equipment_svc             |
+|  trainer_svc | attendance_svc | face_svc                 |
+|  Validation -> Business Logic -> Goi Repository          |
++---------------------------+------------------------------+
+                            |
++---------------------------v------------------------------+
+|                 Repositories Layer                       |
+|  member_repo | membership_repo | equipment_repo          |
+|  trainer_repo | attendance_repo                          |
+|  SQL thuan (INSERT/SELECT/UPDATE) -> Model objects       |
++---------------------------+------------------------------+
+                            |
++---------------------------v------------------------------+
+|                   Models Layer                           |
+|  BaseModel | Member | MembershipPlan | Equipment         |
+|  Trainer | MembershipSubscription | Attendance           |
++---------------------------+------------------------------+
+                            |
++---------------------------v------------------------------+
+|                  Core Layer + Database                   |
+|  config.py | database.py | security.py | SQLite3         |
++----------------------------------------------------------+
+\end{verbatim}
+
+\subsection{Thêm (Create)}
+
+\begin{lstlisting}[style=pythonstyle, caption={Thêm hội viên mới -- Service Layer}]
+# app/services/member_svc.py
+def create_member(name, phone, email=None, gender=None,
+                  date_of_birth=None, address=None,
+                  emergency_contact=None):
+    # Buoc 1: Validate du lieu dau vao
+    if not name or not name.strip():
+        raise ValueError("Ten khong duoc de trong")
+    if not phone or not re.match(r'^0\d{9}$', phone):
+        raise ValueError("So dien thoai khong hop le")
+
+    # Buoc 2: Tao model object
+    member = Member(name=name.strip(), phone=phone.strip(),
+                    email=email, gender=gender,
+                    date_of_birth=date_of_birth,
+                    address=address,
+                    emergency_contact=emergency_contact)
+
+    # Buoc 3: Goi repository de luu vao DB
+    return member_repo.create(member)
+\end{lstlisting}
+
+\begin{lstlisting}[style=pythonstyle, caption={Thêm hội viên -- Repository Layer}]
+# app/repositories/member_repo.py
+def create(member):
+    with get_db() as conn:
+        conn.execute("""
+            INSERT INTO members
+            (id, name, phone, email, gender, date_of_birth,
+             address, emergency_contact, photo, pin,
+             created_at, updated_at, is_active)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """, (member.id, member.name, member.phone,
+              member.email, member.gender,
+              member.date_of_birth, member.address,
+              member.emergency_contact, member.photo,
+              member.pin,
+              member.created_at.isoformat(),
+              member.updated_at.isoformat(),
+              int(member.is_active)))
+    return member
+\end{lstlisting}
+
+\subsection{Xem (Read)}
+
+\begin{lstlisting}[style=pythonstyle, caption={Lấy danh sách hội viên}]
+# Repository: lay tat ca hoi vien dang active
+def get_all(include_inactive=False):
+    with get_db() as conn:
+        if include_inactive:
+            rows = conn.execute(
+                "SELECT * FROM members ORDER BY created_at DESC"
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM members WHERE is_active = 1 "
+                "ORDER BY created_at DESC"
+            ).fetchall()
+        return [_row_to_model(row) for row in rows]
+
+# Chuyen row thanh object -- dung __new__ khong phai __init__
+def _row_to_model(row):
+    m = Member.__new__(Member)   # Khong goi __init__
+    m.id = row["id"]             # Giu UUID tu DB
+    m.name = row["name"]
+    m.phone = row["phone"]
+    m.created_at = datetime.fromisoformat(row["created_at"])
+    m.is_active = bool(row["is_active"])  # 0/1 -> bool
+    # ... cac field khac
+    return m
+\end{lstlisting}
+
+\textbf{Tại sao dùng \texttt{\_\_new\_\_} thay vì \texttt{\_\_init\_\_}?} Vì \texttt{Member()} sẽ tạo UUID mới và ghi đè giá trị từ database.
+
+\subsection{Sửa (Update)}
+
+\begin{lstlisting}[style=pythonstyle, caption={Cập nhật thông tin hội viên}]
+# Service layer
+def update_member(member_id, **kwargs):
+    member = member_repo.get_by_id(member_id)
+    if not member:
+        raise ValueError("Hoi vien khong ton tai")
+
+    # Validate fields moi
+    if 'phone' in kwargs:
+        if not re.match(r'^0\d{9}$', kwargs['phone']):
+            raise ValueError("SDT khong hop le")
+
+    # Cap nhat va luu
+    for key, value in kwargs.items():
+        setattr(member, key, value)
+    member.update()  # Cap nhat updated_at
+    return member_repo.update(member)
+\end{lstlisting}
+
+\subsection{Xóa (Delete) -- Soft Delete}
+
+\begin{lstlisting}[style=pythonstyle, caption={Xóa mềm hội viên (cascade)}]
+# Repository: soft delete + cascade
+def delete(member_id):
+    with get_db() as conn:
+        now = datetime.now().isoformat()
+        # Soft delete member
+        conn.execute(
+            "UPDATE members SET is_active=0, updated_at=? "
+            "WHERE id=?", (now, member_id))
+        # Cascade: huy subscriptions
+        conn.execute(
+            "UPDATE subscriptions SET is_active=0, "
+            "status='cancelled', updated_at=? "
+            "WHERE member_id=?", (now, member_id))
+        # Cascade: huy trainer assignments
+        conn.execute(
+            "UPDATE trainer_assignments SET is_active=0, "
+            "status='inactive', updated_at=? "
+            "WHERE member_id=?", (now, member_id))
+        # Hard delete notifications
+        conn.execute(
+            "DELETE FROM notifications WHERE user_id=?",
+            (member_id,))
+\end{lstlisting}
+
+% ============================================================
+\section{Một số đoạn code tiêu biểu}
+% ============================================================
+
+\subsection{Nhận diện khuôn mặt (Face ID)}
+
+Module Face ID sử dụng thư viện \texttt{face\_recognition} (dựa trên dlib) để mã hóa và nhận diện khuôn mặt:
+
+\begin{lstlisting}[style=pythonstyle, caption={Mã hóa khuôn mặt}]
+# app/face_id/face_encoder.py
+import face_recognition
+import numpy as np
+
+class FaceEncoder:
+    def encode_face(self, image):
+        """Ma hoa khuon mat thanh vector 128 chieu"""
+        # Detect vi tri khuon mat trong anh
+        face_locations = face_recognition.face_locations(image)
+        if not face_locations:
+            return None
+
+        # Ma hoa thanh vector so (128-dimensional embedding)
+        encodings = face_recognition.face_encodings(
+            image, face_locations
+        )
+        return encodings[0] if encodings else None
+\end{lstlisting}
+
+\begin{lstlisting}[style=pythonstyle, caption={Nhận diện khuôn mặt khi điểm danh}]
+# app/face_id/face_recognizer.py
+class FaceRecognizer:
+    def __init__(self, tolerance=0.45):
+        self.tolerance = tolerance  # Nguong tuong dong
+
+    def recognize(self, face_encoding, known_encodings):
+        """So sanh encoding voi database da biet"""
+        for member_id, known_enc in known_encodings.items():
+            # Tinh khoang cach Euclidean
+            distance = face_recognition.face_distance(
+                [known_enc], face_encoding
+            )[0]
+
+            if distance <= self.tolerance:
+                confidence = 1.0 - distance
+                return member_id, confidence
+
+        return None, 0.0  # Khong nhan dien duoc
+\end{lstlisting}
+
+\textbf{Quy trình điểm danh:}
+\begin{enumerate}[leftmargin=2cm]
+	\item Camera chụp ảnh khuôn mặt hội viên.
+	\item \texttt{FaceEncoder} mã hóa thành vector 128 chiều.
+	\item \texttt{FaceRecognizer} so sánh với database encoding đã lưu.
+	\item Nếu khoảng cách $\leq$ tolerance (0.45): nhận diện thành công $\rightarrow$ tự động check-in.
+	\item Lưu vào bảng \texttt{attendance} với độ tin cậy (confidence).
+\end{enumerate}
+
+\subsection{BaseModel và Soft Delete Pattern}
+
+\begin{lstlisting}[style=pythonstyle, caption={BaseModel -- lớp nền cho mọi model}]
+# app/models/base.py
+import uuid
+from datetime import datetime
+
+class BaseModel:
+    def __init__(self, *args, **kwargs):
+        self.id = str(uuid.uuid4())      # UUID4 duy nhat
+        self.created_at = datetime.now()  # Thoi diem tao
+        self.updated_at = datetime.now()  # Thoi diem cap nhat
+        self.is_active = True             # Soft delete flag
+
+    def update(self):
+        """Cap nhat updated_at"""
+        self.updated_at = datetime.now()
+
+    def delete(self):
+        """Xoa ao -- danh dau is_active = False"""
+        self.is_active = False
+        self.update()
+
+    def to_dict(self):
+        """Chuyen object thanh dict"""
+        return {
+            k: v.isoformat() if isinstance(v, datetime) else v
+            for k, v in self.__dict__.items()
+        }
+\end{lstlisting}
+
+\subsection{Navigation Pattern -- Monkey-patch trên page}
+
+\begin{lstlisting}[style=pythonstyle, caption={Hệ thống điều hướng (routing)}]
+# app/main.py
+def main(page: ft.Page):
+    init_db()  # Khoi tao database
+
+    def navigate(route):
+        page.overlay.clear()
+        page.controls.clear()
+        page.on_search_change = None
+
+        # Lazy import tranh circular dependency
+        if route == "login":
+            from gui.admin.login import LoginScreen
+            page.add(LoginScreen(page))
+        elif route == "dashboard":
+            from gui.admin.dashboard import DashboardScreen
+            page.add(DashboardScreen(page))
+        elif route == "members":
+            from gui.admin.members import MembersScreen
+            page.add(MembersScreen(page))
+        # ... cac route khac
+
+        page.update()
+
+    page.navigate = navigate  # Monkey-patch
+    navigate("login")         # Bat dau tai login
+
+ft.app(target=main)
+\end{lstlisting}
+
+\subsection{GUI State với Dict Closures}
+
+Python closures không thể gán lại biến ngoài (nonlocal), nên dùng dict:
+
+\begin{lstlisting}[style=pythonstyle, caption={Quản lý state trong GUI}]
+def MembersScreen(page):
+    # Dung dict de luu tru state (workaround closure)
+    search_query = {"value": ""}
+    current_filter = {"gender": "all", "status": "all"}
+
+    def on_search(e):
+        search_query["value"] = e.data  # Gan vao dict OK
+        refresh_list()
+
+    def on_filter_change(e):
+        current_filter["gender"] = gender_dropdown.value
+        refresh_list()
+
+    # ... render UI
+\end{lstlisting}
+
+\subsection{Đăng ký khuôn mặt (Face Registration)}
+
+\begin{lstlisting}[style=pythonstyle, caption={Đăng ký khuôn mặt cho hội viên}]
+# app/face_id/face_register.py
+class FaceRegistration:
+    def register_member(self, member_id, images):
+        """Dang ky khuon mat tu nhieu anh"""
+        encodings = []
+        for img in images:
+            enc = self.encoder.encode_face(img)
+            if enc is not None:
+                encodings.append(enc)
+
+        if not encodings:
+            return False, "Khong phat hien khuon mat"
+
+        # Lay encoding trung binh (robust hon)
+        avg_encoding = np.mean(encodings, axis=0)
+
+        # Luu vao file pickle
+        self.save_encoding(member_id, avg_encoding)
+
+        # Luu anh vao data/dataset/{member_id}/
+        self.save_images(member_id, images)
+
+        return True, "Dang ky thanh cong"
+\end{lstlisting}
+
+Dữ liệu Face ID được lưu tại:
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{Encoding}: \texttt{data/encodings/face\_encodings.pkl} (file pickle chứa vector 128 chiều).
+	\item \textbf{Ảnh gốc}: \texttt{data/dataset/\{member\_id\}/*.jpg} (5--10 ảnh mỗi người).
+\end{itemize}
+
+% ============================================================
+\section*{Kết luận}
+% ============================================================
+
+Hệ thống \textbf{Gym Management System with Face ID} đã được xây dựng thành công với các đặc điểm nổi bật:
+
+\begin{itemize}[leftmargin=2cm]
+	\item \textbf{Kiến trúc phân tầng rõ ràng}: GUI $\rightarrow$ Service $\rightarrow$ Repository $\rightarrow$ Database, dễ bảo trì và mở rộng.
+	\item \textbf{Tích hợp Face ID}: Nhận diện khuôn mặt tự động qua camera, nâng cao trải nghiệm người dùng.
+	\item \textbf{2 ứng dụng riêng}: Admin và User, cùng chia sẻ backend.
+	\item \textbf{10 bảng dữ liệu}: Quản lý đầy đủ thông tin hội viên, gói tập, thiết bị, HLV, điểm danh, thanh toán.
+	\item \textbf{Soft delete}: Bảo toàn dữ liệu, hỗ trợ khôi phục.
+	\item \textbf{Công nghệ hiện đại}: Python + Flet + SQLite + dlib/OpenCV.
+\end{itemize}
+
+Hệ thống hiện đạt khoảng \textbf{85\% MVP}, có thể tiếp tục phát triển thêm các tính năng: thống kê nâng cao, xuất báo cáo PDF, tích hợp thanh toán điện tử, và ứng dụng di động.
+\end{document}
