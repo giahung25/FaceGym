@@ -1,0 +1,107 @@
+# Docs: https://taskfile.dev/installation/
+
+version: '3'
+# includes:
+tasks:
+  list:
+    desc: "Lists all available tasks."
+    aliases:
+      - ls
+      - help
+      - tasks
+    cmds:
+      - task --list
+
+  setup:
+    desc: "Setup/Sync environment by installing all Python dependencies and pre-commit hooks."
+    aliases:
+      - sync
+    cmds:
+      - uv sync --group all
+      - task: pre-commit
+
+  venv:
+    desc: "Initialize virtual environment."
+    cmds:
+      - uv venv
+
+  pre-commit:
+    desc: "Install pre-commit hooks."
+    aliases:
+      - pc
+      - sync-pc
+    cmds:
+      - uv run pre-commit install
+
+  pre-commit-run:
+    desc: "Run pre-commit hooks on all files of the repo."
+    aliases:
+      - run-pc
+    cmds:
+      - uv run pre-commit run --all-files
+
+  pre-commit-update:
+    desc: "Upgrade versions of repos in .pre-commit-config.yaml to their latest."
+    aliases:
+      - update-pc
+    cmds:
+      - uv run pre-commit autoupdate
+
+  unit-tests:
+    desc: "Run all unit tests."
+    aliases:
+      - test
+      - utest
+      - unit-test
+    cmds:
+      - uv run --group test pytest packages/flet/tests
+
+  integration-tests:
+    desc: "Run all integration tests. (can take a long while)"
+    aliases:
+      - itest
+      - integration-test
+    cmds:
+      - uv run --group test pytest -s -o log_cli=true -o log_cli_level=DEBUG packages/flet/integration_tests
+
+  serve-docs:
+    desc: "Serve MkDocs documentation from the 'packages/flet' directory."
+    aliases:
+      - docs
+    cmds:
+      - uv run --group docs --directory packages/flet mkdocs serve --dirtyreload
+
+  serve-docs-fast:
+    desc: "Serve MkDocs documentation from the 'packages/flet' directory without watching for file changes. Use this if you don't want to restart the server on every file change."
+    aliases:
+      - docs-fast
+    cmds:
+      - FLET_DOCS_SKIP_PYPI_INDEX=1 uv run --group docs --directory packages/flet mkdocs serve --dirtyreload
+
+  docs-coverage:
+    desc: "Run docstring coverage report for all SDK Python packages."
+    cmds:
+      - |
+        status=0
+        for pkg in packages/*; do
+          if [ -f "$pkg/pyproject.toml" ] && [ -d "$pkg/src" ]; then
+            pkg_name=$(basename "$pkg")
+            echo "====== $pkg ======"
+            uv run --group docs-coverage docstr-coverage -C .docstr.yaml "$pkg/src" --badge="packages/flet/docs/assets/badges/docs-coverage/${pkg_name}.svg" || status=$?
+            echo
+          fi
+        done
+        exit $status
+
+  docs-coverage-flet:
+    desc: "Run docstring coverage report for 'flet' package only."
+    cmds:
+      - uv run --group docs-coverage docstr-coverage -C .docstr.yaml packages/flet/src --badge="packages/flet/docs/assets/badges/docs-coverage/flet.svg"
+
+  free-port-8550:
+    desc: "Frees Unix port 8550 by killing any process using it. Useful when you receive 'Address already in use' error."
+    prompt: "This will kill any process using port 8550. Do you want to continue?"
+    aliases:
+      - free-8550
+    cmds:
+      - kill -9 $(lsof -ti :8550)
