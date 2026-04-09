@@ -36,8 +36,10 @@ Thumbs.db
 .agent/
 .agents/
 .claude/
+.gemini/
 #skill 
 skill-lock.json
+skills-lock.json
 CLAUDE.md
 sub_prompt.txt
 #sdk
