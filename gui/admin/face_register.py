@@ -30,7 +30,7 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
     # ── Danh sach hoi vien ────────────────────────────────────────────────────
     member_list = ft.Column(controls=[], spacing=0, scroll=ft.ScrollMode.AUTO, height=400)
     search_field = ft.TextField(
-        label="Tim hoi vien...",
+        label="Tìm hội viên...",
         prefix_icon=ft.Icons.SEARCH,
         border_radius=theme.BUTTON_RADIUS,
         on_change=lambda e: load_members(e.control.value),
@@ -106,7 +106,7 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
             ft.Text(f"SDT: {member.phone}", size=theme.FONT_SM, color=theme.TEXT_SECONDARY),
             ft.Container(
                 content=ft.Text(
-                    "Da dang ky Face ID" if is_registered else "Chua dang ky Face ID",
+                    "Đã đăng ký Face ID" if is_registered else "Chưa đăng ký Face ID",
                     size=theme.FONT_XS, color=theme.WHITE, weight=ft.FontWeight.W_600,
                 ),
                 bgcolor=theme.GREEN if is_registered else theme.AMBER,
@@ -116,14 +116,14 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
         ])
 
         progress_bar.value = 0
-        progress_text.value = "0/10 anh"
-        status_text.value = "Bam 'Mo Camera' de dang ky khuon mat"
+        progress_text.value = "0/10 ảnh"
+        status_text.value = "Bấm 'Mở Camera' để đăng ký khuôn mặt"
         status_text.color = theme.GRAY
         page.update()
 
     # ── Camera status area ────────────────────────────────────────────────────
     camera_status_icon = ft.Icon(ft.Icons.CAMERA_ALT, size=48, color=theme.GRAY)
-    camera_status_text = ft.Text("Chon hoi vien va mo camera",
+    camera_status_text = ft.Text("Chọn hội viên và mở camera",
                                   size=theme.FONT_MD, color=theme.GRAY)
 
     camera_placeholder = ft.Container(
@@ -148,8 +148,8 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
     # ── Progress ──────────────────────────────────────────────────────────────
     progress_bar = ft.ProgressBar(value=0, width=400, color=theme.ORANGE,
                                   bgcolor=theme.GRAY_LIGHT)
-    progress_text = ft.Text("0/10 anh", size=theme.FONT_SM, color=theme.GRAY)
-    status_text = ft.Text("Chon hoi vien de bat dau", size=theme.FONT_SM, color=theme.GRAY)
+    progress_text = ft.Text("0/10 ảnh", size=theme.FONT_SM, color=theme.GRAY)
+    status_text = ft.Text("Chọn hội viên để bắt đầu", size=theme.FONT_SM, color=theme.GRAY)
 
     # ── Lang nghe ket qua tu camera process ──────────────────────────────────
     async def listen_camera_results():
@@ -165,14 +165,14 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
                     total = msg.get("total", 10)
                     progress_bar.value = current / total
                     progress_text.value = f"{current}/{total} anh"
-                    status_text.value = "Dang chup... Hay xoay mat nhe qua cac goc"
+                    status_text.value = "Đang chụp... Hãy xoay mặt nhẹ qua các góc"
                     status_text.color = theme.ORANGE
                     page.update()
 
                 elif msg_type == "register_complete":
                     member = selected_member["obj"]
                     if member:
-                        status_text.value = "Dang encode khuon mat..."
+                        status_text.value = "Đang encode khuôn mặt..."
                         status_text.color = theme.BLUE
                         page.update()
 
@@ -187,36 +187,36 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
                             result = face_svc.register_face_from_images(member.id, image_paths)
 
                             if result.get("success"):
-                                status_text.value = f"Dang ky thanh cong! ({result.get('encodings', 0)} encodings)"
+                                status_text.value = f"Đăng ký thành công! ({result.get('encodings', 0)} encodings)"
                                 status_text.color = theme.GREEN
                                 load_members()
                                 updated = member_repo.get_by_id(member.id)
                                 if updated:
                                     select_member(updated)
                             else:
-                                status_text.value = "Khong tim thay khuon mat trong anh!"
+                                status_text.value = "Không tìm thấy khuôn mặt trong ảnh!"
                                 status_text.color = theme.RED
                         except Exception as ex:
-                            status_text.value = f"Loi encode: {ex}"
+                            status_text.value = f"Lỗi encode: {ex}"
                             status_text.color = theme.RED
 
                         page.update()
 
                 elif msg_type == "register_failed":
                     captured = msg.get("captured", 0)
-                    status_text.value = f"Chup bi gian doan ({captured} anh). Thu lai."
+                    status_text.value = f"Chụp bị gián đoạn ({captured} ảnh). Thử lại."
                     status_text.color = theme.RED
                     page.update()
 
                 elif msg_type == "camera_closed":
                     camera_status_icon.icon = ft.Icons.CAMERA_ALT
                     camera_status_icon.color = theme.GRAY
-                    camera_status_text.value = "Camera da dong"
+                    camera_status_text.value = "Camera đã đóng"
                     page.update()
                     break
 
                 elif msg_type == "camera_error":
-                    status_text.value = f"Loi camera: {msg.get('message', '')}"
+                    status_text.value = f"Lỗi camera: {msg.get('message', '')}"
                     status_text.color = theme.RED
                     page.update()
 
@@ -227,13 +227,13 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
     # ── Buttons ───────────────────────────────────────────────────────────────
     def open_camera(e):
         if not selected_member["obj"]:
-            status_text.value = "Vui long chon hoi vien truoc!"
+            status_text.value = "Vui lòng chọn hội viên trước!"
             status_text.color = theme.RED
             page.update()
             return
 
         if bridge.is_camera_running():
-            status_text.value = "Camera dang ban!"
+            status_text.value = "Camera đang bận!"
             status_text.color = theme.RED
             page.update()
             return
@@ -253,8 +253,8 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
 
         camera_status_icon.icon = ft.Icons.VIDEOCAM
         camera_status_icon.color = theme.GREEN
-        camera_status_text.value = "Camera dang chay (cua so rieng)"
-        status_text.value = "Camera da mo. Bam 'Bat dau chup' tren cua so camera."
+        camera_status_text.value = "Camera đang chạy (cửa sổ riêng)"
+        status_text.value = "Camera đã mở. Bấm 'Bắt đầu chụp' trên cửa sổ camera."
         status_text.color = theme.ORANGE
         page.update()
 
@@ -267,14 +267,14 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
             return
         try:
             face_svc.remove_face(member.id)
-            status_text.value = "Da xoa du lieu khuon mat"
+            status_text.value = "Đã xóa dữ liệu khuôn mặt"
             status_text.color = theme.AMBER
             load_members()
             updated = member_repo.get_by_id(member.id)
             if updated:
                 select_member(updated)
         except Exception as ex:
-            status_text.value = f"Loi xoa: {ex}"
+            status_text.value = f"Lỗi xóa: {ex}"
             status_text.color = theme.RED
         page.update()
 
@@ -282,7 +282,7 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
         content=ft.Row(
             controls=[
                 ft.Icon(ft.Icons.VIDEOCAM, size=14, color=theme.WHITE),
-                ft.Text("Mo Camera", size=theme.FONT_SM, weight=ft.FontWeight.W_600,
+                ft.Text("Mở Camera", size=theme.FONT_SM, weight=ft.FontWeight.W_600,
                         color=theme.WHITE),
             ],
             spacing=4,
@@ -299,7 +299,7 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
         content=ft.Row(
             controls=[
                 ft.Icon(ft.Icons.DELETE, size=14, color=theme.WHITE),
-                ft.Text("Xoa Face ID", size=theme.FONT_SM, weight=ft.FontWeight.W_600,
+                ft.Text("Xóa Face ID", size=theme.FONT_SM, weight=ft.FontWeight.W_600,
                         color=theme.WHITE),
             ],
             spacing=4,
@@ -316,7 +316,7 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
     left_panel = ft.Container(
         content=ft.Column(
             controls=[
-                ft.Text("Chon hoi vien", size=theme.FONT_XL, weight=ft.FontWeight.BOLD,
+                ft.Text("Chọn hội viên", size=theme.FONT_XL, weight=ft.FontWeight.BOLD,
                         color=theme.TEXT_PRIMARY),
                 search_field,
                 ft.Container(
@@ -337,7 +337,7 @@ def FaceRegisterScreen(page: ft.Page) -> ft.Row:
 
     right_panel = ft.Column(
         controls=[
-            ft.Text("Dang ky khuon mat", size=theme.FONT_XL, weight=ft.FontWeight.BOLD,
+            ft.Text("Đăng ký khuôn mặt", size=theme.FONT_XL, weight=ft.FontWeight.BOLD,
                     color=theme.TEXT_PRIMARY),
             ft.Container(
                 content=selected_info,

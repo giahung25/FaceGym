@@ -30,10 +30,10 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
 
     # ── Ket qua nhan dien ─────────────────────────────────────────────────────
     result_icon = ft.Icon(ft.Icons.FACE, size=48, color=theme.GRAY)
-    result_title = ft.Text("San sang check-in", size=theme.FONT_2XL,
+    result_title = ft.Text("Sẵn sàng check-in", size=theme.FONT_2XL,
                            weight=ft.FontWeight.BOLD, color=theme.TEXT_PRIMARY,
                            text_align=ft.TextAlign.CENTER)
-    result_message = ft.Text("Nhan nut ben duoi de bat dau",
+    result_message = ft.Text("Nhấn nút bên dưới để bắt đầu",
                              size=theme.FONT_MD, color=theme.TEXT_SECONDARY,
                              text_align=ft.TextAlign.CENTER)
     result_time = ft.Text("", size=theme.FONT_SM, color=theme.GRAY,
@@ -55,7 +55,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
 
     # ── Camera status placeholder ─────────────────────────────────────────────
     camera_status_icon = ft.Icon(ft.Icons.FACE, size=64, color=theme.GRAY)
-    camera_status_text = ft.Text("Bam nut ben duoi de bat dau check-in",
+    camera_status_text = ft.Text("Bấm nút bên dưới để bắt đầu check-in",
                                   size=theme.FONT_MD, color=theme.GRAY,
                                   text_align=ft.TextAlign.CENTER)
 
@@ -117,7 +117,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
             if not records:
                 history_list.controls.append(
                     ft.Container(
-                        content=ft.Text("Chua co lich su diem danh",
+                        content=ft.Text("Chưa có lịch sử điểm danh",
                                         size=theme.FONT_SM, color=theme.GRAY),
                         padding=ft.padding.all(theme.PAD_LG),
                     )
@@ -160,7 +160,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
                             result_icon.icon = ft.Icons.CHECK_CIRCLE
                             result_icon.color = theme.GREEN
                             result_title.value = f"Xin chao, {member_name}!"
-                            result_message.value = "Check-in thanh cong!"
+                            result_message.value = "Check-in thành công!"
                             result_message.color = theme.GREEN
                             result_time.value = f"Thoi gian: {now_str}"
                             load_history()
@@ -168,21 +168,21 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
                             result_icon.icon = ft.Icons.INFO
                             result_icon.color = theme.BLUE
                             result_title.value = f"Chao, {member_name}!"
-                            result_message.value = "Ban da diem danh hom nay roi"
+                            result_message.value = "Bạn đã điểm danh hôm nay rồi"
                             result_message.color = theme.BLUE
                             result_time.value = ""
                         elif status == "expired":
                             result_icon.icon = ft.Icons.WARNING
                             result_icon.color = theme.AMBER
                             result_title.value = f"Chao, {member_name}!"
-                            result_message.value = "Da check-in! (Goi tap het han)"
+                            result_message.value = "Đã check-in! (Gói tập hết hạn)"
                             result_message.color = theme.AMBER
-                            result_time.value = "Vui long gia han tai quay"
+                            result_time.value = "Vui lòng gia hạn tại quầy"
                             load_history()
                         elif status != "cooldown":
                             result_icon.icon = ft.Icons.ERROR
                             result_icon.color = theme.AMBER
-                            result_title.value = "Loi"
+                            result_title.value = "Lỗi"
                             result_message.value = checkin_result.get("message", "")
                             result_message.color = theme.AMBER
 
@@ -192,13 +192,13 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
                     camera_status_icon.icon = ft.Icons.FACE
                     camera_status_icon.color = theme.GRAY
                     camera_status_text.value = "Camera da dong. Bam nut de mo lai."
-                    btn_text.value = "Bat dau Check-in"
+                    btn_text.value = "Bắt đầu Check-in"
                     btn_icon.icon = ft.Icons.FACE
                     page.update()
                     break
 
                 elif msg_type == "camera_error":
-                    camera_status_text.value = f"Loi: {msg.get('message', '')}"
+                    camera_status_text.value = f"Lỗi: {msg.get('message', '')}"
                     page.update()
 
             await asyncio.sleep(0.1)
@@ -206,7 +206,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
         listener_running["active"] = False
 
     # ── Toggle camera ────────────────────────────────────────────────────────
-    btn_text = ft.Text("Bat dau Check-in", size=theme.FONT_MD,
+    btn_text = ft.Text("Bắt đầu Check-in", size=theme.FONT_MD,
                        weight=ft.FontWeight.BOLD, color=theme.WHITE)
     btn_icon = ft.Icon(ft.Icons.FACE, size=20, color=theme.WHITE)
 
@@ -221,10 +221,10 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
 
             camera_status_icon.icon = ft.Icons.VIDEOCAM
             camera_status_icon.color = theme.ORANGE
-            camera_status_text.value = "Camera dang chay (cua so rieng)"
+            camera_status_text.value = "Camera đang chạy (cửa sổ riêng)"
             btn_text.value = "Dung Camera"
             btn_icon.icon = ft.Icons.STOP
-            result_title.value = "Dang quet..."
+            result_title.value = "Đang quét..."
             result_message.value = "Nhin thang vao camera"
             result_message.color = theme.TEXT_SECONDARY
             result_icon.icon = ft.Icons.FACE
@@ -239,11 +239,11 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
             bridge.close_camera()
             camera_status_icon.icon = ft.Icons.FACE
             camera_status_icon.color = theme.GRAY
-            camera_status_text.value = "Bam nut ben duoi de bat dau check-in"
-            btn_text.value = "Bat dau Check-in"
+            camera_status_text.value = "Bấm nút bên dưới để bắt đầu check-in"
+            btn_text.value = "Bắt đầu Check-in"
             btn_icon.icon = ft.Icons.FACE
-            result_title.value = "San sang check-in"
-            result_message.value = "Nhan nut ben duoi de bat dau"
+            result_title.value = "Sẵn sàng check-in"
+            result_message.value = "Nhấn nút bên dưới để bắt đầu"
             result_message.color = theme.TEXT_SECONDARY
             result_icon.icon = ft.Icons.FACE
             result_icon.color = theme.GRAY
@@ -272,7 +272,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
                 content=ft.Row(
                     controls=[
                         ft.Icon(ft.Icons.FACE, size=24, color=theme.ORANGE),
-                        ft.Text("Check-in bang khuon mat", size=theme.FONT_2XL,
+                        ft.Text("Check-in bằng khuôn mặt", size=theme.FONT_2XL,
                                 weight=ft.FontWeight.BOLD, color=theme.TEXT_PRIMARY),
                     ],
                     spacing=theme.PAD_MD,
@@ -292,7 +292,7 @@ def CheckinScreen(page: ft.Page) -> ft.Container:
                             ft.Container(
                                 content=ft.Column(
                                     controls=[
-                                        ft.Text("Lich su diem danh gan day",
+                                        ft.Text("Lịch sử điểm danh gần đây",
                                                 size=theme.FONT_MD,
                                                 weight=ft.FontWeight.W_600,
                                                 color=theme.TEXT_PRIMARY),

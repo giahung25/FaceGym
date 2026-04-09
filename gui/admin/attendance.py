@@ -28,7 +28,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
 
     # ── Camera status area ────────────────────────────────────────────────────
     camera_status_icon = ft.Icon(ft.Icons.VIDEOCAM_OFF, size=48, color=theme.GRAY)
-    camera_status_text = ft.Text("Camera chua bat", size=theme.FONT_MD, color=theme.GRAY)
+    camera_status_text = ft.Text("Camera chưa bật", size=theme.FONT_MD, color=theme.GRAY)
 
     camera_placeholder = ft.Container(
         content=ft.Column(
@@ -51,7 +51,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
 
     # ── Ket qua nhan dien ────────────────────────────────────────────────────
     result_icon = ft.Icon(ft.Icons.FACE, size=28, color=theme.GRAY)
-    result_name = ft.Text("Cho nhan dien...", size=theme.FONT_LG,
+    result_name = ft.Text("Chờ nhận diện...", size=theme.FONT_LG,
                           weight=ft.FontWeight.W_600, color=theme.TEXT_PRIMARY)
     result_status = ft.Text("", size=theme.FONT_SM, color=theme.GRAY)
 
@@ -75,7 +75,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
     # ── Thong ke nhanh ────────────────────────────────────────────────────────
     stat_today_count = ft.Text("0", size=theme.FONT_3XL, weight=ft.FontWeight.BOLD,
                                color=theme.ORANGE)
-    stat_today_label = ft.Text("Check-in hom nay", size=theme.FONT_SM, color=theme.GRAY)
+    stat_today_label = ft.Text("Check-in hôm nay", size=theme.FONT_SM, color=theme.GRAY)
 
     stats_card = ft.Container(
         content=ft.Column(
@@ -97,7 +97,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
     def build_attendance_row(record):
         att = record["attendance"]
         member = record["member"]
-        name = member.name if member else "Khong xac dinh"
+        name = member.name if member else "Không xác định"
         check_in_str = ""
         if att.check_in:
             try:
@@ -167,7 +167,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
             if not records:
                 attendance_table.controls.append(
                     ft.Container(
-                        content=ft.Text("Chua co ai diem danh hom nay",
+                        content=ft.Text("Chưa có ai điểm danh hôm nay",
                                         size=theme.FONT_SM, color=theme.GRAY,
                                         text_align=ft.TextAlign.CENTER),
                         padding=ft.padding.all(theme.PAD_2XL),
@@ -213,20 +213,20 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
                             result_icon.icon = ft.Icons.CHECK_CIRCLE
                             result_icon.color = theme.GREEN
                             result_name.value = member_name
-                            result_status.value = f"Check-in thanh cong! ({confidence:.0%})"
+                            result_status.value = f"Check-in thành công! ({confidence:.0%})"
                             result_status.color = theme.GREEN
                             load_today_attendance()
                         elif status == "already":
                             result_icon.icon = ft.Icons.INFO
                             result_icon.color = theme.BLUE
                             result_name.value = member_name
-                            result_status.value = "Da diem danh hom nay"
+                            result_status.value = "Đã điểm danh hôm nay"
                             result_status.color = theme.BLUE
                         elif status == "expired":
                             result_icon.icon = ft.Icons.WARNING
                             result_icon.color = theme.AMBER
                             result_name.value = member_name
-                            result_status.value = "Da check-in! (Goi tap het han)"
+                            result_status.value = "Đã check-in! (Gói tập hết hạn)"
                             result_status.color = theme.AMBER
                             load_today_attendance()
                         elif status == "cooldown":
@@ -235,7 +235,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
                             result_icon.icon = ft.Icons.ERROR
                             result_icon.color = theme.AMBER
                             result_name.value = member_name
-                            result_status.value = checkin_result.get("message", "Loi")
+                            result_status.value = checkin_result.get("message", "Lỗi")
                             result_status.color = theme.AMBER
 
                         page.update()
@@ -245,17 +245,17 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
                     if time.time() - last_result["time"] > 3:
                         result_icon.icon = ft.Icons.FACE
                         result_icon.color = theme.GRAY
-                        result_name.value = "Dang quet..."
+                        result_name.value = "Đang quét..."
                         result_status.value = ""
                         page.update()
 
                 elif msg_type == "camera_closed":
                     camera_status_icon.icon = ft.Icons.VIDEOCAM_OFF
                     camera_status_icon.color = theme.GRAY
-                    camera_status_text.value = "Camera da dong"
-                    btn_camera_text.value = "Bat Camera"
+                    camera_status_text.value = "Camera đã đóng"
+                    btn_camera_text.value = "Bật Camera"
                     btn_camera_icon.icon = ft.Icons.VIDEOCAM
-                    result_name.value = "Cho nhan dien..."
+                    result_name.value = "Chờ nhận diện..."
                     result_status.value = ""
                     result_icon.color = theme.GRAY
                     result_icon.icon = ft.Icons.FACE
@@ -263,7 +263,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
                     break
 
                 elif msg_type == "camera_error":
-                    camera_status_text.value = f"Loi: {msg.get('message', '')}"
+                    camera_status_text.value = f"Lỗi: {msg.get('message', '')}"
                     page.update()
 
             await asyncio.sleep(0.1)
@@ -271,7 +271,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
         listener_running["active"] = False
 
     # ── Nut bat/tat camera ────────────────────────────────────────────────────
-    btn_camera_text = ft.Text("Bat Camera", size=theme.FONT_SM,
+    btn_camera_text = ft.Text("Bật Camera", size=theme.FONT_SM,
                               weight=ft.FontWeight.W_600, color=theme.WHITE)
     btn_camera_icon = ft.Icon(ft.Icons.VIDEOCAM, size=16, color=theme.WHITE)
 
@@ -286,8 +286,8 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
 
             camera_status_icon.icon = ft.Icons.VIDEOCAM
             camera_status_icon.color = theme.GREEN
-            camera_status_text.value = "Camera dang chay (cua so rieng)"
-            btn_camera_text.value = "Tat Camera"
+            camera_status_text.value = "Camera đang chạy (cửa sổ riêng)"
+            btn_camera_text.value = "Tắt Camera"
             btn_camera_icon.icon = ft.Icons.VIDEOCAM_OFF
             page.update()
 
@@ -297,10 +297,10 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
             bridge.close_camera()
             camera_status_icon.icon = ft.Icons.VIDEOCAM_OFF
             camera_status_icon.color = theme.GRAY
-            camera_status_text.value = "Camera chua bat"
-            btn_camera_text.value = "Bat Camera"
+            camera_status_text.value = "Camera chưa bật"
+            btn_camera_text.value = "Bật Camera"
             btn_camera_icon.icon = ft.Icons.VIDEOCAM
-            result_name.value = "Cho nhan dien..."
+            result_name.value = "Chờ nhận diện..."
             result_status.value = ""
             result_icon.color = theme.GRAY
             result_icon.icon = ft.Icons.FACE
@@ -321,8 +321,8 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
 
     # ── Check-in thu cong ────────────────────────────────────────────────────
     manual_phone = ft.TextField(
-        label="SDT hoi vien",
-        hint_text="Nhap so dien thoai...",
+        label="SĐT hội viên",
+        hint_text="Nhập số điện thoại...",
         width=200,
         border_radius=theme.BUTTON_RADIUS,
     )
@@ -331,13 +331,13 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
     def do_manual_checkin(e):
         phone = manual_phone.value.strip() if manual_phone.value else ""
         if not phone:
-            manual_error.value = "Nhap SDT"
+            manual_error.value = "Nhập SĐT"
             page.update()
             return
 
         member = member_repo.get_by_phone(phone)
         if not member:
-            manual_error.value = "Khong tim thay hoi vien"
+            manual_error.value = "Không tìm thấy hội viên"
             page.update()
             return
 
@@ -348,11 +348,11 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
             result_icon.icon = ft.Icons.CHECK_CIRCLE
             result_icon.color = theme.GREEN
             result_name.value = member.name
-            result_status.value = "Check-in thu cong thanh cong!"
+            result_status.value = "Check-in thủ công thành công!"
             result_status.color = theme.GREEN
             load_today_attendance()
         else:
-            manual_error.value = result.get("message", "Loi")
+            manual_error.value = result.get("message", "Lỗi")
         page.update()
 
     btn_manual = ft.Container(
@@ -375,7 +375,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
     manual_section = ft.Container(
         content=ft.Column(
             controls=[
-                ft.Text("Check-in thu cong", size=theme.FONT_MD,
+                ft.Text("Check-in thủ công", size=theme.FONT_MD,
                         weight=ft.FontWeight.W_600, color=theme.TEXT_PRIMARY),
                 ft.Row(
                     controls=[manual_phone, btn_manual],
@@ -397,13 +397,13 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
         content=ft.Row(
             controls=[
                 ft.Container(width=32),
-                ft.Text("Hoi vien", size=theme.FONT_XS, color=theme.GRAY,
+                ft.Text("Hội viên", size=theme.FONT_XS, color=theme.GRAY,
                         weight=ft.FontWeight.W_600, expand=True),
-                ft.Text("Vao", size=theme.FONT_XS, color=theme.GRAY,
+                ft.Text("Vào", size=theme.FONT_XS, color=theme.GRAY,
                         weight=ft.FontWeight.W_600, width=80),
                 ft.Text("Ra", size=theme.FONT_XS, color=theme.GRAY,
                         weight=ft.FontWeight.W_600, width=80),
-                ft.Text("Phuong thuc", size=theme.FONT_XS, color=theme.GRAY,
+                ft.Text("Phương thức", size=theme.FONT_XS, color=theme.GRAY,
                         weight=ft.FontWeight.W_600, width=80),
             ],
             spacing=theme.PAD_MD,
@@ -416,7 +416,7 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
     # ── Layout tong the ──────────────────────────────────────────────────────
     left_col = ft.Column(
         controls=[
-            ft.Text("Camera Nhan Dien", size=theme.FONT_XL,
+            ft.Text("Camera Nhận Diện", size=theme.FONT_XL,
                     weight=ft.FontWeight.BOLD, color=theme.TEXT_PRIMARY),
             camera_container,
             ft.Row(
@@ -435,14 +435,14 @@ def AttendanceScreen(page: ft.Page) -> ft.Row:
         controls=[
             ft.Row(
                 controls=[
-                    ft.Text("Diem danh hom nay", size=theme.FONT_XL,
+                    ft.Text("Điểm danh hôm nay", size=theme.FONT_XL,
                             weight=ft.FontWeight.BOLD, color=theme.TEXT_PRIMARY),
                     ft.Container(expand=True),
                     ft.Container(
                         content=ft.Row(
                             controls=[
                                 ft.Icon(ft.Icons.REFRESH, size=14, color=theme.ORANGE),
-                                ft.Text("Lam moi", size=theme.FONT_SM, color=theme.ORANGE,
+                                ft.Text("Làm mới", size=theme.FONT_SM, color=theme.ORANGE,
                                         weight=ft.FontWeight.W_600),
                             ],
                             spacing=4,

@@ -85,7 +85,7 @@ def TrainerStudentsScreen(page: ft.Page) -> ft.Container:
     def open_detail(member, sub, assignment):
         detail_body.controls = [
             info_row("Họ tên", member.name),
-            info_row("SDT", member.phone),
+            info_row("SĐT", member.phone),
             info_row("Email", getattr(member, "email", None)),
             info_row("Giới tính", getattr(member, "gender", None)),
         ]
