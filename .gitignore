@@ -57,3 +57,7 @@ data/member_pics/*
 data/gym_db.db
 !data/**/.gitkeep
 logs/
+
+
+idea.md
+idea_1.txt
