@@ -34,15 +34,26 @@ def TrainerStudentsScreen(page: ft.Page) -> ft.Container:
 
     def save_notes(e):
         try:
-            assignment_svc.update_assignment_notes(
-                notes_target["assignment_id"], notes_field.value or ""
-            )
+            assignment_id = notes_target["assignment_id"]
+            new_notes = notes_field.value or ""
+            assignment_svc.update_assignment_notes(assignment_id, new_notes)
+
+            # Cập nhật state tại chỗ trong biến students
+            for stu in students:
+                if stu["assignment"].id == assignment_id:
+                    stu["assignment"].notes = new_notes
+                    break
+
             notes_msg.value = "Đã lưu ghi chú!"
             notes_msg.color = theme.GREEN
             page.update()
-            # Rebuild screen
-            if navigate:
-                navigate("trainer_students")
+
+            # Đợi 0.5s để user thấy thông báo rồi đóng dialog + rebuild list
+            import time
+            time.sleep(0.5)
+            notes_dialog.open = False
+            rebuild_list()
+            page.update()
         except ValueError as ex:
             notes_msg.value = str(ex)
             notes_msg.color = theme.RED

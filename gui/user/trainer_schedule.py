@@ -35,7 +35,7 @@ def TrainerScheduleScreen(page: ft.Page) -> ft.Container:
 
     # ── Dialog thêm/sửa buổi tập ───────────────────────────────────────────
     fs_member = ft.Dropdown(label="Học viên *", expand=True)
-    # fs_date = ft.TextField(label="Ngày (YYYY-MM-DD) *", expand=True, read_only=True)
+    fs_date = ft.TextField(label="Ngày (YYYY-MM-DD) *", expand=True, read_only=True)
     # Giờ bắt đầu: dropdown giờ + dropdown phút
     fs_start_h = ft.Dropdown(label="Giờ BĐ *", options=list(hour_options), width=90)
     fs_start_m = ft.Dropdown(label="Phút *", options=list(minute_options), width=90)
@@ -81,7 +81,7 @@ def TrainerScheduleScreen(page: ft.Page) -> ft.Container:
                 schedule_svc.create_session(
                     trainer_id=current_user.id,
                     member_id=fs_member.value,
-                    # session_date=fs_date.value.strip(),
+                    session_date=fs_date.value.strip(),
                     start_time=start_time,
                     end_time=end_time or None,
                     content=fs_content.value.strip() or None,
@@ -89,7 +89,7 @@ def TrainerScheduleScreen(page: ft.Page) -> ft.Container:
             else:
                 s = editing_session["obj"]
                 s.member_id = fs_member.value
-                # s.session_date = fs_date.value.strip()
+                s.session_date = fs_date.value.strip()
                 s.start_time = start_time
                 s.end_time = end_time or None
                 s.content = fs_content.value.strip() or None
@@ -107,7 +107,7 @@ def TrainerScheduleScreen(page: ft.Page) -> ft.Container:
         title=session_dialog_title,
         content=ft.Column([
             ft.Row([fs_member], spacing=theme.PAD_MD),
-            # fs_date,
+            fs_date,
             ft.Text("Giờ bắt đầu *", size=theme.FONT_SM, color=theme.GRAY, weight=ft.FontWeight.W_600),
             ft.Row([fs_start_h, ft.Text(":", size=theme.FONT_LG, weight=ft.FontWeight.BOLD), fs_start_m],
                    spacing=theme.PAD_SM, vertical_alignment=ft.CrossAxisAlignment.CENTER),
@@ -130,7 +130,7 @@ def TrainerScheduleScreen(page: ft.Page) -> ft.Container:
             ft.dropdown.Option(s["member"].id, s["member"].name) for s in students
         ]
         fs_member.value = None
-        # fs_date.value = date_str
+        fs_date.value = date_str
         _set_time_dropdowns(None, fs_start_h, fs_start_m)
         _set_time_dropdowns(None, fs_end_h, fs_end_m)
         fs_content.value = ""
@@ -145,7 +145,7 @@ def TrainerScheduleScreen(page: ft.Page) -> ft.Container:
             ft.dropdown.Option(s["member"].id, s["member"].name) for s in students
         ]
         fs_member.value = session_obj.member_id
-        # fs_date.value = session_obj.session_date
+        fs_date.value = session_obj.session_date
         _set_time_dropdowns(session_obj.start_time, fs_start_h, fs_start_m)
         _set_time_dropdowns(session_obj.end_time, fs_end_h, fs_end_m)
         fs_content.value = session_obj.content or ""

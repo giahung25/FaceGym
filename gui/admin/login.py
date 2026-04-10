@@ -42,19 +42,31 @@ def LoginScreen(page: ft.Page) -> ft.Container:
     # Ô nhập username
     username_field = ft.TextField(
         label="Tên đăng nhập",                     # Label hiển thị bên trong ô
-        prefix_icon=ft.Icons.PERSON_OUTLINE,        # Icon người ở đầu ô
+        prefix_icon=ft.Icon(ft.Icons.PERSON_OUTLINE, color=theme.TEXT_SECONDARY),
         border_radius=theme.BUTTON_RADIUS,          # Bo góc 8px
         focused_border_color=theme.ORANGE,          # Viền cam khi focus (click vào)
+        focused_color=theme.ORANGE,                 # Màu label khi focus
+        label_style=ft.TextStyle(color=theme.TEXT_SECONDARY),
+        color=theme.TEXT_PRIMARY,                   # Chữ đen
+        bgcolor=theme.WHITE,                        # Nền trắng
+        filled=True,                                # Cho phép hiển thị màu nền
+        cursor_color=theme.ORANGE,
     )
 
     # Ô nhập password
     password_field = ft.TextField(
         label="Mật khẩu",
-        prefix_icon=ft.Icons.LOCK_OUTLINE,          # Icon ổ khóa
+        prefix_icon=ft.Icon(ft.Icons.LOCK_OUTLINE, color=theme.TEXT_SECONDARY),
         password=True,                               # Ẩn ký tự (hiện •••)
         can_reveal_password=True,                    # Cho phép click icon mắt để hiện password
         border_radius=theme.BUTTON_RADIUS,
         focused_border_color=theme.ORANGE,
+        focused_color=theme.ORANGE,                 # Màu label khi focus
+        label_style=ft.TextStyle(color=theme.TEXT_SECONDARY),
+        color=theme.TEXT_PRIMARY,                   # Chữ đen
+        bgcolor=theme.WHITE,                        # Nền trắng
+        filled=True,                                # Cho phép hiển thị màu nền
+        cursor_color=theme.ORANGE,
     )
 
     # ── Hàm xử lý đăng nhập ─────────────────────────────────────────────────
